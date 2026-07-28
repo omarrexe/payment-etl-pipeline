@@ -71,7 +71,7 @@ def generate_paypal_data(num_rows, file_name, date):
                      nullable_columns=["payer_name", "payer_email"],
                      drift_column="payer_name",
                      new_name="full_name")
-    df.to_json(file_name, orient="records", lines=True)
+    df.to_json(file_name, orient="records", lines=True, date_format="iso")
     return df
 
 
