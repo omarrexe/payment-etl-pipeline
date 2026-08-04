@@ -1,3 +1,4 @@
 pyarrow
 faker
 pandas
+pandera
