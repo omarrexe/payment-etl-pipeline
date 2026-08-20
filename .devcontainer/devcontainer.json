@@ -1,0 +1,41 @@
+{
+  "name": "Payment ETL Pipeline",
+
+  // Use the official Microsoft Python 3.11 dev container image
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+
+  // ── Run once after the container is created ─────────────────
+  // Installs deps, creates folders, and generates sample data
+  "postCreateCommand": "bash setup.sh",
+
+  // ── VS Code settings inside the container ───────────────────
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",           // Python language support
+        "ms-python.pylance",          // Fast type checking & intellisense
+        "ms-python.black-formatter",  // Auto-formatting
+        "ms-toolsai.jupyter",         // Jupyter notebooks (optional exploration)
+        "eamodio.gitlens",            // Git history & blame
+        "ms-azuretools.vscode-docker" // Useful if you add Docker later
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "editor.formatOnSave": true,
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter"
+        },
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+
+  // ── Forward ports (uncomment if you add a dashboard later) ──
+  // "forwardPorts": [8501],   // Streamlit
+  // "forwardPorts": [8888],   // Jupyter
+
+  // ── Features (extra tools you might want) ───────────────────
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}  // Ensures latest git
+  }
+}
