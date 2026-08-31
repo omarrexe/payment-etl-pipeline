@@ -1,5 +1,6 @@
 from faker import Faker
 import pandas as pd
+import os
 import random
 from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo
@@ -139,6 +140,9 @@ def inject_mess(df, date, nullable_columns, drift_column, new_name):
 
 if __name__ == "__main__":
     date = "2026-07-16"
+    os.makedirs("data/raw/stripe", exist_ok=True)
+    os.makedirs("data/raw/paypal", exist_ok=True)
+    os.makedirs("data/raw/bank_ach", exist_ok=True)  # ← أضفت هذا
 
     generate_stripe_data(100, "data/raw/stripe/2026-07-16.csv", date)
     generate_paypal_data(100, "data/raw/paypal/2026-07-16.json", date)
