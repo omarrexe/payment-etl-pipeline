@@ -1,14 +1,16 @@
-from faker import Faker
-import pandas as pd
 import os
 import random
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
+
+import pandas as pd
+from faker import Faker
+
 fake = Faker()
 
 
 def generate_stripe_data(num_rows, file_name, date):
-    date_obj = datetime.strptime(date, "%Y-%m-%d")
+    date_obj = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
     start = date_obj.replace(
         hour=0,  minute=0,  second=0,  tzinfo=timezone.utc)
     end = date_obj.replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
@@ -43,8 +45,8 @@ def generate_stripe_data(num_rows, file_name, date):
 
 def generate_paypal_data(num_rows, file_name, date):
 
-    date_obj = datetime.strptime(date, "%Y-%m-%d")
     local_tz = ZoneInfo("America/New_York")
+    date_obj = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=local_tz)
     start = date_obj.replace(hour=0,  minute=0,  second=0,  tzinfo=local_tz)
     end = date_obj.replace(hour=23, minute=59, second=59, tzinfo=local_tz)
     rows = []
@@ -78,7 +80,7 @@ def generate_paypal_data(num_rows, file_name, date):
 
 def generate_bank_ach_data(num_rows, file_name, date):
 
-    date_obj = datetime.strptime(date, "%Y-%m-%d")
+    date_obj = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
 
     rows = []
 
@@ -125,7 +127,7 @@ def inject_null(df, nullable_columns):
 
 
 def inject_schema_drift(df, date, drift_column, new_name):
-    day = datetime.strptime(date, "%Y-%m-%d").day
+    day = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=timezone.utc).day
     if day % 3 == 0:
         df.rename(columns={drift_column: new_name}, inplace=True)
     return df
@@ -142,7 +144,7 @@ if __name__ == "__main__":
     date = "2026-07-16"
     os.makedirs("data/raw/stripe", exist_ok=True)
     os.makedirs("data/raw/paypal", exist_ok=True)
-    os.makedirs("data/raw/bank_ach", exist_ok=True)  # ← أضفت هذا
+    os.makedirs("data/raw/bank_ach", exist_ok=True)   
 
     generate_stripe_data(100, "data/raw/stripe/2026-07-16.csv", date)
     generate_paypal_data(100, "data/raw/paypal/2026-07-16.json", date)
