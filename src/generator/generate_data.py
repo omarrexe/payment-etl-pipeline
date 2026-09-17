@@ -1,13 +1,16 @@
-from faker import Faker
-import pandas as pd
+import os
 import random
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
+
+import pandas as pd
+from faker import Faker
+
 fake = Faker()
 
 
 def generate_stripe_data(num_rows, file_name, date):
-    date_obj = datetime.strptime(date, "%Y-%m-%d")
+    date_obj = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
     start = date_obj.replace(
         hour=0,  minute=0,  second=0,  tzinfo=timezone.utc)
     end = date_obj.replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
@@ -19,7 +22,7 @@ def generate_stripe_data(num_rows, file_name, date):
             "name": fake.name(),
             "customer_id": f"cust_{fake.random_number(digits=8, fix_len=True)}",
             "transaction_id": fake.uuid4(),
-            "amount": round(float(fake.pydecimal(left_digits=3, right_digits=2, positive=True)), 2),
+            "amount_cents": int(round(float(fake.pydecimal(left_digits=3, right_digits=2, positive=True)), 2) * 100),
             "currency": "USD",
             "timestamp": fake.date_time_between(
                 start_date=start,
@@ -29,22 +32,21 @@ def generate_stripe_data(num_rows, file_name, date):
             "source": "stripe",
         })
 
-   
     df = pd.DataFrame(rows)
-    #injct mess
-    df = inject_mess(df, date,                       
-    nullable_columns=["name"],
-    drift_column="name",
-    new_name="full_name")
-    
+    # inject mess
+    df = inject_mess(df, date,
+                     nullable_columns=["name"],
+                     drift_column="name",
+                     new_name="full_name")
+
     df.to_csv(file_name, index=False)
     return df
 
 
 def generate_paypal_data(num_rows, file_name, date):
 
-    date_obj = datetime.strptime(date, "%Y-%m-%d")
     local_tz = ZoneInfo("America/New_York")
+    date_obj = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=local_tz)
     start = date_obj.replace(hour=0,  minute=0,  second=0,  tzinfo=local_tz)
     end = date_obj.replace(hour=23, minute=59, second=59, tzinfo=local_tz)
     rows = []
@@ -66,19 +68,19 @@ def generate_paypal_data(num_rows, file_name, date):
 
         })
 
-  # injct mess
+    # inject mess
     df = pd.DataFrame(rows)
     df = inject_mess(df, date,
-    nullable_columns=["payer_name", "payer_email"],
-    drift_column="payer_name",
-    new_name="full_name")
-    df.to_csv(file_name, index=False)
+                     nullable_columns=["payer_name", "payer_email"],
+                     drift_column="payer_name",
+                     new_name="full_name")
+    df.to_json(file_name, orient="records", lines=True, date_format="iso")
     return df
 
 
 def generate_bank_ach_data(num_rows, file_name, date):
 
-    date_obj = datetime.strptime(date, "%Y-%m-%d")
+    date_obj = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
 
     rows = []
 
@@ -101,36 +103,34 @@ def generate_bank_ach_data(num_rows, file_name, date):
         })
 
     df = pd.DataFrame(rows)
-     # injct mess
+    # inject mess
     df = inject_mess(df, date,
-    nullable_columns=["account_holder"],
-    drift_column="account_holder",
-    new_name="holder_name")
-    df.to_csv(file_name, index=False)
+                     nullable_columns=["account_holder"],
+                     drift_column="account_holder",
+                     new_name="holder_name")
+    df.to_parquet(file_name, index=False)
     return df
 
 
 def inject_duplicates(df):
     n = random.randint(1, 5)
-    return pd.concat([df,df.sample(n)]).sample(frac=1).reset_index(drop=True)
-    
+    return pd.concat([df, df.sample(n)]).sample(frac=1).reset_index(drop=True)
+
 
 def inject_null(df, nullable_columns):
     for col in nullable_columns:
-         n = random.randint(1, 5)
-         null_indices = df.sample(n=n).index
-         df.loc[null_indices, col] = None
-         
+        n = random.randint(1, 5)
+        null_indices = df.sample(n=n).index
+        df.loc[null_indices, col] = None
+
     return df
-    
-    
-    
+
+
 def inject_schema_drift(df, date, drift_column, new_name):
-    day = datetime.strptime(date, "%Y-%m-%d").day
+    day = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=timezone.utc).day
     if day % 3 == 0:
         df.rename(columns={drift_column: new_name}, inplace=True)
     return df
-
 
 
 def inject_mess(df, date, nullable_columns, drift_column, new_name):
@@ -140,14 +140,14 @@ def inject_mess(df, date, nullable_columns, drift_column, new_name):
     return df
 
 
- 
-
-
 if __name__ == "__main__":
     date = "2026-07-16"
-    
+    os.makedirs("data/raw/stripe", exist_ok=True)
+    os.makedirs("data/raw/paypal", exist_ok=True)
+    os.makedirs("data/raw/bank_ach", exist_ok=True)   
+
     generate_stripe_data(100, "data/raw/stripe/2026-07-16.csv", date)
-    generate_paypal_data(100, "data/raw/paypal/2026-07-16.csv", date)
-    generate_bank_ach_data(100, "data/raw/bank_ach/2026-07-16.csv", date)
-    
+    generate_paypal_data(100, "data/raw/paypal/2026-07-16.json", date)
+    generate_bank_ach_data(100, "data/raw/bank_ach/2026-07-16.parquet", date)
+
     print("Data generated successfully!")
