@@ -2,29 +2,7 @@
 
 Incremental ETL pipeline ingesting multi-source payment data (Stripe / PayPal / Bank ACH) with schema validation, deduplication, and partitioned Parquet output.
 
----
-
-## Quick Start (any machine)
-
-```bash
-git clone https://github.com/<your-username>/payment-etl-pipeline.git
-cd payment-etl-pipeline
-bash setup.sh
-```
-
-That's it. `setup.sh` will:
-1. Create a `.venv` virtual environment
-2. Install all dependencies from `requirements.txt`
-3. Create all required folders (`data/`, `rejects/`, `logs/`)
-4. Generate sample data for all 3 sources
-
-Then activate the venv in your shell:
-```bash
-source .venv/bin/activate
-```
-
----
-
+ 
 ## Project Structure
 
 ```
