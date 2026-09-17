@@ -38,7 +38,7 @@ payment-etl-pipeline/
 | Phase | Description | Status |
 |---|---|---|
 | 1 | Fake data generator | ✅ Done |
-| 2 | Ingestion & normalization | 🔄 In progress |
+| 2 | Ingestion & normalization | ✅ Done|
 | 3 | Schema validation & rejects | ⬜ Pending |
 | 4 | Deduplication & idempotency | ⬜ Pending |
 | 5 | Partitioned Parquet output | ⬜ Pending |
