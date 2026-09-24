@@ -3,6 +3,8 @@ from pandera.errors import SchemaErrors
 from validation.schema import schema
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parent.parent
+
 def validate(df):
     try:
         clean_df = schema.validate(df, lazy=True)
@@ -26,5 +28,6 @@ def validate(df):
 
 
 def write_rejects(rejects_df, day):
-    Path("data/rejects").mkdir(parents=True, exist_ok=True)
-    rejects_df.to_csv(f"data/rejects/{day}_rejects.csv", index=False)
+    rejects_dir = ROOT / "data/rejects"
+    rejects_dir.mkdir(parents=True, exist_ok=True)
+    rejects_df.to_csv(rejects_dir / f"{day}_rejects.csv", index=False)
