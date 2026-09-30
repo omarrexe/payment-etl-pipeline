@@ -1,6 +1,4 @@
 import pandas as pd
-from datetime import datetime, timezone
-import pandas as pd
 
 def _normalize_status(series):
     mapping = {

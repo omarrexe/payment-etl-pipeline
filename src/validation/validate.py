@@ -1,9 +1,7 @@
 import pandas as pd
 from pandera.errors import SchemaErrors
 from validation.schema import schema
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parent.parent
+from config import REJECTS_DIR
 
 def validate(df):
     try:
@@ -28,6 +26,5 @@ def validate(df):
 
 
 def write_rejects(rejects_df, day):
-    rejects_dir = ROOT / "data/rejects"
-    rejects_dir.mkdir(parents=True, exist_ok=True)
-    rejects_df.to_csv(rejects_dir / f"{day}_rejects.csv", index=False)
+    REJECTS_DIR.mkdir(parents=True, exist_ok=True)
+    rejects_df.to_csv(REJECTS_DIR / f"{day}_rejects.csv", index=False)
