@@ -10,16 +10,15 @@ payment-etl-pipeline/
 ├── src/
 │   ├── generator/        # Phase 1 — fake data generator
 │   ├── ingestion/        # Phase 2 — readers for each source
-│   ├── transforms/       # Phase 3 — validation & cleaning
-│   ├── validation/       # Phase 3 — schema validation
-│   ├── storage/          # Phase 5 — Parquet output
+│   ├── transforms/       # Phase 2 — normalization & cleaning
+│   ├── validation/       # Phase 3 — schema validation & rejects gate
+│   ├── storage/          # Phase 5 — Parquet output (empty for now)
+│   ├── config.py         # Shared paths
 │   └── pipeline.py       # Main orchestrator
 ├── data/
 │   ├── raw/              # Raw source files (generated, not in git)
-│   └── warehouse/        # Clean partitioned output (not in git)
-├── rejects/              # Rejected rows with reason codes
-├── logs/                 # Pipeline run logs
-├── setup.sh              # Bootstrap script
+│   ├── rejects/          # Rejected rows with reason codes (not in git)
+│   └── warehouse/        # Clean partitioned output (not in git, Phase 5)
 ├── requirements.txt
 └── DESIGN.md             # Unified schema & data flow design
 ```
@@ -39,7 +38,7 @@ payment-etl-pipeline/
 |---|---|---|
 | 1 | Fake data generator | ✅ Done |
 | 2 | Ingestion & normalization | ✅ Done|
-| 3 | Schema validation & rejects | ⬜ Pending |
+| 3 | Schema validation & rejects | ✅ Done |
 | 4 | Deduplication & idempotency | ⬜ Pending |
 | 5 | Partitioned Parquet output | ⬜ Pending |
 | 6 | Late-arriving data / backfill | ⬜ Pending |

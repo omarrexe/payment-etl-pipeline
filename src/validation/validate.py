@@ -14,12 +14,11 @@ def validate(df):
         failures = e.failure_cases
         bad_rows = failures["index"].unique()
 
-        reasons = (failures.groupby("index")["check"]
-                           .agg("; ".join))
+        failures["reason"] = failures["column"].fillna("schema") + ": " + failures["check"]
+        reasons = failures.groupby("index")["reason"].agg("; ".join)
 
         rejects_df = df.loc[bad_rows].copy()
         rejects_df["reject_reason"] = (reasons.reindex(bad_rows).values)
-        rejects_df.insert(0, "n", range(1, len(rejects_df) + 1))
         clean_df = df.drop(bad_rows)
         return clean_df, rejects_df
 

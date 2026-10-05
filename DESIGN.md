@@ -37,8 +37,8 @@ data/raw/bank_ach/   ──┘                      │
 ## Phase Checklist
 
 - [x] Phase 1: Fake data generator
-- [ ] Phase 2: Ingestion & normalization
-- [ ] Phase 3: Schema validation & rejects
+- [x] Phase 2: Ingestion & normalization
+- [x] Phase 3: Schema validation & rejects
 - [ ] Phase 4: Deduplication
 - [ ] Phase 5: Partitioned Parquet output
 - [ ] Phase 6: Late-arriving data
